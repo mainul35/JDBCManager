@@ -108,8 +108,9 @@ public class JDBCManager {
      *
      */
     public ArrayList<HashMap<String, String>> getQueryData(String sql, String[] columns, String... params) {
-        try {
-            pstmt = con.prepareStatement(sql);
+        Connection conn = con;
+        try {    
+            pstmt = conn.prepareStatement(sql);
             for (int i = 0; i < params.length; i++) {
                 pstmt.setObject(i + 1, params[i]);
             }
@@ -127,7 +128,7 @@ public class JDBCManager {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -155,8 +156,9 @@ public class JDBCManager {
      *
      */
     public ArrayList<HashMap<String, String>> getQueryData(String sql, String[] columns, String param) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             pstmt.setObject(1, param);
             ResultSet rs = pstmt.executeQuery();
             ArrayList<HashMap<String, String>> al = new ArrayList<>();
@@ -172,7 +174,7 @@ public class JDBCManager {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -200,8 +202,9 @@ public class JDBCManager {
      *
      */
     public ArrayList<HashMap<String, String>> getQueryData(String sql, String column, String param) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             pstmt.setObject(1, param);
             ResultSet rs = pstmt.executeQuery();
             ArrayList<HashMap<String, String>> al = new ArrayList<>();
@@ -215,7 +218,7 @@ public class JDBCManager {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -242,8 +245,9 @@ public class JDBCManager {
      *
      */
     public ArrayList<HashMap<String, String>> getQueryData(String sql, String[] columns) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             ArrayList<HashMap<String, String>> al = new ArrayList<>();
             while (rs.next()) {
@@ -266,7 +270,7 @@ public class JDBCManager {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -292,8 +296,9 @@ public class JDBCManager {
      *
      */
     public ArrayList<HashMap<String, String>> getQueryData(String sql) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             ArrayList<HashMap<String, String>> al = new ArrayList<>();
             String columns[] = null;
@@ -317,7 +322,7 @@ public class JDBCManager {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -339,8 +344,9 @@ public class JDBCManager {
      *
      */
     public void insertData(String sql, String... values) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             for (int i = 0; i < values.length; i++) {
                 pstmt.setObject(i + 1, (Object) values[i]);
             }
@@ -349,7 +355,7 @@ public class JDBCManager {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -369,15 +375,16 @@ public class JDBCManager {
      *
      */
     public void insertData(String sql) {
+        Connection conn = con;
         try {
-            Statement stmt = con.createStatement();
+            Statement stmt = conn.createStatement();
             stmt.setQueryTimeout(30);
             stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -398,8 +405,9 @@ public class JDBCManager {
      *
      */
     public void updateData(String sql, String[] params) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             for (int i = 0; i < params.length; i++) {
                 pstmt.setObject(i + 1, params[i]);
             }
@@ -408,7 +416,7 @@ public class JDBCManager {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -427,14 +435,15 @@ public class JDBCManager {
      *
      */
     public void updateData(String sql) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -455,8 +464,9 @@ public class JDBCManager {
      *
      */
     public void deleteData(String sql, String[] params) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             for (int i = 0; i < params.length; i++) {
                 pstmt.setObject(i + 1, params[i]);
             }
@@ -465,7 +475,7 @@ public class JDBCManager {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -485,15 +495,16 @@ public class JDBCManager {
      *
      */
     public void deleteData(String sql, String param) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             pstmt.setObject(1, param);
             pstmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -512,17 +523,29 @@ public class JDBCManager {
      *
      */
     public void deleteData(String sql) {
+        Connection conn = con;
         try {
-            pstmt = con.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+    }
+    
+    /**
+     * Close the connection to the database when all the query is completed.
+     */
+    public void close(){
+        try {
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
