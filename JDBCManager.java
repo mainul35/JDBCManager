@@ -214,49 +214,7 @@ public class JDBCManager {
         return null;
     }
 
-//    /**
-//     * Fetches data from the database according to the provided SQL query
-//     * written in <code>PreparedStatement</code> format.<br>
-//     * Example:<br>
-//     * <code>
-//     * String sql = "SELECT `name` FROM `user` WHERE `name` = ?;";<br>
-//     *
-//     * ArrayList al = getQueryData(sql, "name", "John");
-//     * </code>
-//     *
-//     * @param sql The query to be executed.
-//     * @param column A single column to be fetched.
-//     * @param param A <code>String</code> query parameter.
-//     *
-//     * @return An <code>ArrayList</code> object containing a
-//     * <code>HashMap</code> object with the table column names as keys and cell
-//     * values as values.
-//     *
-//     */
-//    public ArrayList<HashMap<String, String>> getQueryData(String sql, String column, String param) {
-//        initConnection();
-//        try {
-//            pstmt = con.prepareStatement(sql);
-//            pstmt.setObject(1, param);
-//            ResultSet rs = pstmt.executeQuery();
-//            ArrayList<HashMap<String, String>> al = new ArrayList<>();
-//            while (rs.next()) {
-//                HashMap<String, String> hm = new HashMap<>();
-//                hm.put(column, rs.getString(column));
-//                al.add(hm);
-//            }
-//            return al;
-//        } catch (SQLException ex) {
-//            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-//        } finally {
-//            try {
-//                con.close();
-//            } catch (SQLException ex) {
-//                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        }
-//        return null;
-//    }
+
     /**
      * Fetches data from the database according to the provided SQL query and
      * query parameter.
