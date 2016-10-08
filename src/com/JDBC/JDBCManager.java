@@ -139,12 +139,13 @@ public class JDBCManager {
                 }
                 al.add(hm);
             }
+            rs.close();
             return al;
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                con.close(); 
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -194,12 +195,13 @@ public class JDBCManager {
                 }
                 al.add(hm);
             }
+            rs.close();
             return al;
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                con.close(); 
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -250,12 +252,13 @@ public class JDBCManager {
                 }
                 al.add(hm);
             }
+            rs.close();
             return al;
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                con.close();
+                con.close(); 
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -302,6 +305,7 @@ public class JDBCManager {
                 }
                 al.add(hm);
             }
+            rs.close();
             return al;
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -328,16 +332,17 @@ public class JDBCManager {
      * @param params Values to be inserted.
      *
      */
-    public void insertData(String sql, String... params) {
+    public boolean insertData(String sql, String... params) {
         initConnection();
         try {
             pstmt = con.prepareStatement(sql);
             for (int i = 0; i < params.length; i++) {
-                pstmt.setObject(i + 1, (Object) params[i]);
+                pstmt.setObject(i + 1, params[i]);
             }
             pstmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         } finally {
             try {
                 con.close();
@@ -345,6 +350,7 @@ public class JDBCManager {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        return true;
     }
 
     /**
@@ -362,8 +368,9 @@ public class JDBCManager {
      */
     public boolean insertData(String sql) {
         initConnection();
+        Statement stmt = null;
         try {
-            Statement stmt = con.createStatement();
+            stmt = con.createStatement();
             stmt.setQueryTimeout(30);
             int i = stmt.executeUpdate(sql);
             if(i>0){
@@ -371,8 +378,8 @@ public class JDBCManager {
             }
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } finally {
+        }
+        finally {
             try {
                 con.close();
             } catch (SQLException ex) {
@@ -440,7 +447,7 @@ public class JDBCManager {
             return false;
         } finally {
             try {
-                con.close();
+                con.close(); 
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -475,7 +482,7 @@ public class JDBCManager {
             return false;
         } finally {
             try {
-                con.close();
+                con.close(); 
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -507,7 +514,7 @@ public class JDBCManager {
             return false;
         } finally {
             try {
-                con.close();
+                con.close(); 
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -537,7 +544,7 @@ public class JDBCManager {
             return false;
         } finally {
             try {
-                con.close();
+                con.close(); 
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -561,7 +568,7 @@ public class JDBCManager {
             return false;
         } finally {
             try {
-                con.close();
+                con.close(); 
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -585,7 +592,7 @@ public class JDBCManager {
             return false;
         } finally {
             try {
-                con.close();
+                con.close(); 
             } catch (SQLException ex) {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
