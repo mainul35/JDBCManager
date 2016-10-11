@@ -332,7 +332,7 @@ public class JDBCManager {
      * @param params Values to be inserted.
      *
      */
-    public boolean insertData(String sql, String... params) {
+    public boolean insertData(String sql, Object... params) {
         initConnection();
         try {
             pstmt = con.prepareStatement(sql);
@@ -394,8 +394,7 @@ public class JDBCManager {
      * statement and parameters. <br>Example:<br>
      * <code>
      * sql = "UPDATE `user` SET `firstName` = ? WHERE `userId` = ?'";<br>
-     * String[] params = new String[]{"Mainul", "1"};<br>
-     * updateData(sql, arr);
+     * updateData(sql, "Mainul", "1");
      * </code>
      *
      * @param sql The SQL statement.
@@ -403,7 +402,7 @@ public class JDBCManager {
      * @return <code>boolean</code> value based on success or failure of updating data.
      *
      */
-    public boolean updateData(String sql, String[] params) {
+    public boolean updateData(String sql, Object... params) {
         initConnection();
         try {
             pstmt = con.prepareStatement(sql);
@@ -552,17 +551,24 @@ public class JDBCManager {
     }
 
     /**
-     * Creates a table based on the SQL table creation statement.
-     *
+     * Checks if a value exists in a table column.
+     * 
      * @param sql The SQL statement to be executed.
-     * @return <code>boolean</code> value based on success or failure of creating table.
+     * @param params values to be matched with.
+     * @return <code>boolean</code> value based on success or failure upon checking data.
+     *
      */
-    public boolean createTable(String sql) {
+    public boolean contains(String sql, Object... params){
         initConnection();
         try {
             pstmt = con.prepareStatement(sql);
-            pstmt.executeUpdate();
-            return true;
+            for(int i = 0; i<params.length; i++){
+                pstmt.setObject(i+1, params[i]);
+            }
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()==true){
+                return true;
+            }
         } catch (SQLException ex) {
             Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -573,6 +579,31 @@ public class JDBCManager {
                 Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        return false;
+    }
+    
+    /**
+     * Creates a table based on the SQL table creation statement.
+     *
+     * @param sql The SQL statement to be executed.
+     * @return <code>boolean</code> value based on success or failure of creating table.
+     */
+    public boolean createTable(String sql) {
+        initConnection();
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        } finally {
+            try {
+                con.close(); 
+            } catch (SQLException ex) {
+                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return true;
     }
 
     /**
