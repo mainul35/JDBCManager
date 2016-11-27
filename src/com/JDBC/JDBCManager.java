@@ -1,5 +1,6 @@
 package com.JDBC;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,6 +9,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,19 +17,19 @@ import java.util.logging.Logger;
 /**
  *
  * @author Syed Mainul Hasan
- * @version     1.03
+ * @version 1.03
  */
 public class JDBCManager {
 
     public static final String MYSQL_DRIVER_MANAGER = "com.mysql.jdbc.Driver";
     public static final String SQLITE_DRIVER_MANAGER = "org.sqlite.JDBC";
-    private static Connection con = null;
-    private static PreparedStatement pstmt = null;
-    private static String dbName = null;
-    private static String connectionType = null;
-    private static String dbUser = null;
-    private static String dbPassword = null;
-    private static String dbLocation = null;
+    private Connection con = null;
+    private PreparedStatement pstmt = null;
+    private String dbName = null;
+    private String connectionType = null;
+    private String dbUser = null;
+    private String dbPassword = null;
+    private String dbLocation = null;
 
     /**
      *
@@ -42,11 +44,11 @@ public class JDBCManager {
      *
      */
     public void initMysqlConnection(String dbLocation, String dbName, String dbUser, String dbPassword) {
-        JDBCManager.dbLocation = dbLocation;
-        JDBCManager.dbName = dbName;
-        JDBCManager.dbPassword = dbPassword;
-        JDBCManager.dbUser = dbUser;
-        JDBCManager.connectionType = "mysql";
+        this.dbLocation = dbLocation;
+        this.dbName = dbName;
+        this.dbPassword = dbPassword;
+        this.dbUser = dbUser;
+        this.connectionType = "mysql";
     }
 
     /**
@@ -62,10 +64,10 @@ public class JDBCManager {
      *
      */
     public void initMysqlConnection(String dbName, String dbUser, String dbPassword) {
-        JDBCManager.dbName = dbName;
-        JDBCManager.dbPassword = dbPassword;
-        JDBCManager.dbUser = dbUser;
-        JDBCManager.connectionType = "mysql";
+        this.dbName = dbName;
+        this.dbPassword = dbPassword;
+        this.dbUser = dbUser;
+        this.connectionType = "mysql";
     }
 
     /**
@@ -78,19 +80,19 @@ public class JDBCManager {
      *
      */
     public void initSqliteConnection(String dbName) {
-        JDBCManager.dbName = dbName;
-        JDBCManager.connectionType = "sqlite";
+        this.dbName = dbName;
+        this.connectionType = "sqlite";
     }
 
     private void initConnection() {
         try {
-            if ("sqlite".equals(JDBCManager.connectionType)) {
+            if ("sqlite".equals(this.connectionType)) {
                 Class.forName(SQLITE_DRIVER_MANAGER);
                 con = DriverManager.getConnection("jdbc:sqlite:" + dbName);
-            } else if ("mysql".equals(JDBCManager.connectionType) && JDBCManager.dbLocation == null) {
+            } else if ("mysql".equals(this.connectionType) && this.dbLocation == null) {
                 Class.forName(MYSQL_DRIVER_MANAGER);
                 con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + dbName, dbUser, dbPassword);
-            } else if ("mysql".equals(JDBCManager.connectionType) && JDBCManager.dbLocation != null) {
+            } else if ("mysql".equals(this.connectionType) && this.dbLocation != null) {
                 Class.forName(MYSQL_DRIVER_MANAGER);
                 con = DriverManager.getConnection(dbLocation + dbName, dbUser, dbPassword);
             } else {
@@ -104,112 +106,6 @@ public class JDBCManager {
     }
 
     /**
-     * Fetches data from the database according to the provided SQL query
-     * written in <code>PreparedStatement</code> format.<br>
-     * Example:<br>
-     * <code>
-     * String sql = "SELECT `name`, `age` FROM `user` WHERE `name` = ? AND `age` = ?;";<br>
-     *
-     * ArrayList al = getQueryData(sql, new String[]{"name", age}, "John",
-     * "24");
-     * </code>
-     *
-     * @param sql The query to be executed.
-     * @param columns Columns to be fetched.
-     * @param params Query parameters sequentially.
-     *
-     * @return An <code>ArrayList</code> object containing a
-     * <code>HashMap</code> object with the table column names as keys and cell
-     * values as values.
-     *
-     */
-    public ArrayList<HashMap<String, String>> getQueryData(String sql, String[] columns, String... params) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            for (int i = 0; i < params.length; i++) {
-                pstmt.setObject(i + 1, params[i]);
-            }
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<HashMap<String, String>> al = new ArrayList<>();
-            while (rs.next()) {
-                HashMap<String, String> hm = new HashMap<>();
-                for (String column : columns) {
-                    hm.put(columns[0], rs.getString(columns[0]));
-                }
-                al.add(hm);
-            }
-            rs.close();
-            return al;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Fetches data from the database according to the provided SQL query
-     * written in <code>PreparedStatement</code> format.<br>
-     * Example:<br>
-     * <code>
-     * String sql = "SELECT `name`, `age` FROM `user` WHERE `name` = ?;";<br>
-     *
-     * ArrayList al = getQueryData(sql, new String[]{"name", age}, "John");
-     * </code>
-     *
-     * @param sql The query to be executed.
-     * @param columns Columns to be fetched.
-     * @param param A <code>String</code> query parameter.
-     *
-     * @return An <code>ArrayList</code> object containing a
-     * <code>HashMap</code> object with the table column names as keys and cell
-     * values as values.
-     *
-     */
-    public ArrayList<HashMap<String, String>> getQueryData(String sql, String[] columns, String param) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            pstmt.setObject(1, param);
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<HashMap<String, String>> al = new ArrayList<>();
-            while (rs.next()) {
-
-                HashMap<String, String> hm = new HashMap<>();
-                if (columns == null) {
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    int columnCount = rsmd.getColumnCount();
-                    columns = new String[columnCount];
-                    for (int i = 0; i < columnCount; i++) {
-                        columns[i] = rsmd.getColumnName(i + 1);
-                    }
-                }
-                for (String column : columns) {
-                    hm.put(column, rs.getString(column));
-                }
-                al.add(hm);
-            }
-            rs.close();
-            return al;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return null;
-    }
-
-    /**
      * Fetches data from the database according to the provided SQL query and
      * query parameter.
      * <br>
@@ -217,53 +113,28 @@ public class JDBCManager {
      * <code>
      * String sql = "SELECT `name`, `age` FROM `user` WHERE `age` = ?;";<br>
      *
-     * ArrayList al = getQueryData(sql, "20");
+     * ArrayList al = getQueryData(sql, new Integer(20));
      * </code>
      *
      * @param sql The query to be executed.
-     * @param param Value to be matched.
+     * @param params Value to be matched.
      *
      * @return An <code>ArrayList</code> object containing a
      * <code>HashMap</code> object with the table column names as keys and cell
      * values as values.
+     * @throws java.sql.SQLException
      *
      */
-    public ArrayList<HashMap<String, String>> getQueryData(String sql, String param) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            pstmt.setObject(1, param);
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<HashMap<String, String>> al = new ArrayList<>();
-            String columns[] = null;
-            while (rs.next()) {
-
-                HashMap<String, String> hm = new HashMap<>();
-                if (columns == null) {
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    int columnCount = rsmd.getColumnCount();
-                    columns = new String[columnCount];
-                    for (int i = 0; i < columnCount; i++) {
-                        columns[i] = rsmd.getColumnName(i + 1);
-                    }
-                }
-                for (int i = 0; i < columns.length; i++) {
-                    hm.put(columns[i], rs.getString(columns[i]));
-                }
-                al.add(hm);
-            }
-            rs.close();
-            return al;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    public ResultSet getQueryData(String sql, Object... params) throws SQLException {
+        if (con == null) {
+            initConnection();
         }
-        return null;
+        pstmt = con.prepareStatement(sql);
+        for (int i = 0; i < params.length; i++) {
+            pstmt.setObject(i + 1, params[i]);
+        }
+        ResultSet rs = pstmt.executeQuery();
+        return rs;
     }
 
     /**
@@ -281,42 +152,16 @@ public class JDBCManager {
      * @return An <code>ArrayList</code> object containing a
      * <code>HashMap</code> object with the table column names as keys and cell
      * values as values.
+     * @throws java.sql.SQLException
      *
      */
-    public ArrayList<HashMap<String, String>> getQueryData(String sql) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<HashMap<String, String>> al = new ArrayList<>();
-            String columns[] = null;
-            while (rs.next()) {
-                HashMap<String, String> hm = new HashMap<>();
-                if (columns == null) {
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    int columnCount = rsmd.getColumnCount();
-                    columns = new String[columnCount];
-                    for (int i = 0; i < columnCount; i++) {
-                        columns[i] = rsmd.getColumnName(i + 1);
-                    }
-                }
-                for (String column : columns) {
-                    hm.put(column, rs.getString(column));
-                }
-                al.add(hm);
-            }
-            rs.close();
-            return al;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    public ResultSet getQueryData(String sql) throws SQLException {
+        if (con == null) {
+            initConnection();
         }
-        return null;
+        pstmt = con.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+        return rs;
     }
 
     /**
@@ -328,65 +173,41 @@ public class JDBCManager {
      * insertData(String sql, "Mainul", "Hasan");
      * </code>
      *
-     * @param sql The SQL statement.
-     * @param params Values to be inserted.
+     * @param tableName Table name to insert values.
+     * @param colNames Column names of a table where values will be inserted.
+     * @param valueSets To enable multiple insertions in multiple columns.
+     * @return
+     * @throws java.sql.SQLException
      *
      */
-    public boolean insertData(String sql, Object... params) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            for (int i = 0; i < params.length; i++) {
-                pstmt.setObject(i + 1, params[i]);
+    public boolean insertData(String tableName, String[] colNames, Object[]... valueSets) throws SQLException {
+        if (con == null) {
+            initConnection();
+        }
+        String sql = "insert into " + tableName + "(";
+        for (int i = 0; i < colNames.length; i++) {
+            if ((i + 1) != colNames.length) {
+                sql += "`" + colNames[i] + "`,";
+            } else {
+                sql += "`" + colNames[i] + "`)";
             }
+        }
+        sql += " VALUES(";
+        for (int i = 0; i < colNames.length; i++) {
+            if ((i + 1 != colNames.length)) {
+                sql += "?,";
+            } else {
+                sql += "?);";
+            }
+        }
+        System.err.println(sql);
+        pstmt = con.prepareStatement(sql);
+        int i = 0;
+        for (Object[] valueSet : valueSets) {
+            pstmt.setObject(++i, valueSet);
             pstmt.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
-        return true;
-    }
-
-    /**
-     * Inserts data into tables based on the provided SQL insertion
-     * statement.<br>
-     * Example:<br>
-     * <code>
-     * sql = "INSERT INTO `user`(`firstName`, `lastName`) VALUES('Mainul', 'Hasan');";<br>
-     * insertData(String sql);
-     * </code>
-     *
-     * @param sql The SQL statement.
-     * @return <code>boolean</code> value based on success or failure of inserting data.
-     *
-     */
-    public boolean insertData(String sql) {
-        initConnection();
-        Statement stmt = null;
-        try {
-            stmt = con.createStatement();
-            stmt.setQueryTimeout(30);
-            int i = stmt.executeUpdate(sql);
-            if(i>0){
-                return true;
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return false;
+        return  true;
     }
 
     /**
@@ -398,59 +219,22 @@ public class JDBCManager {
      * </code>
      *
      * @param sql The SQL statement.
-     * @param params The parameters to be set as the replacement of "?" marks.
-     * @return <code>boolean</code> value based on success or failure of updating data.
+     * @param sqlParams update parameter values.
+     * @return <code>boolean</code> value based on success or failure of
+     * updating data.
+     * @throws java.sql.SQLException
      *
      */
-    public boolean updateData(String sql, Object... params) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            for (int i = 0; i < params.length; i++) {
-                pstmt.setObject(i + 1, params[i]);
-            }
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    public boolean updateData(String sql, Object... sqlParams) throws SQLException {
+        if (con == null) {
+            initConnection();
         }
-    }
+        pstmt = con.prepareStatement(sql);
+        for (int i = 0; i < sqlParams.length; i++) {
+            pstmt.setObject(i + 1, sqlParams[i]);
+        }
+        return pstmt.executeUpdate() > 0;
 
-    /**
-     * Updates data of database table(s) based on the provided SQL update<br>
-     * statement and parameters. <br>Example:<br>
-     * <code>
-     * sql = "UPDATE `user` SET `firstName` = 'Mainul' WHERE `userId` = '1'";<br>
-     * updateData(sql);
-     * </code>
-     *
-     * @param sql The SQL statement.
-     * @return <code>boolean</code> value based on success or failure of updating data.
-     *
-     */
-    public boolean updateData(String sql) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
     }
 
     /**
@@ -464,28 +248,20 @@ public class JDBCManager {
      *
      * @param sql The SQL statement.
      * @param params The parameters to be set as the replacement of "?" marks.
-     * @return <code>boolean</code> value based on success or failure of deleting data.
+     * @return <code>boolean</code> value based on success or failure of
+     * deleting data.
+     * @throws java.sql.SQLException
      *
      */
-    public boolean deleteData(String sql, String[] params) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            for (int i = 0; i < params.length; i++) {
-                pstmt.setObject(i + 1, params[i]);
-            }
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    public boolean deleteData(String sql, String[] sqlParams) throws SQLException {
+        if (con == null) {
+            initConnection();
         }
+        pstmt = con.prepareStatement(sql);
+        for (int i = 0; i < sqlParams.length; i++) {
+            pstmt.setObject(i + 1, sqlParams[i]);
+        }
+        return pstmt.executeUpdate() > 0;
     }
 
     /**
@@ -498,135 +274,88 @@ public class JDBCManager {
      *
      * @param sql The SQL statement.
      * @param param The parameters to be set as the replacement of "?" marks.
-     * @return <code>boolean</code> value based on success or failure of deleting data.
+     * @return <code>boolean</code> value based on success or failure of
+     * deleting data.
+     * @throws java.sql.SQLException
      *
      */
-    public boolean deleteData(String sql, String param) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            pstmt.setObject(1, param);
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    public boolean deleteData(String sql, String sqlParam) throws SQLException {
+        if (con == null) {
+            initConnection();
         }
-    }
-
-    /**
-     * Deletes data from database table(s) based on the provided SQL update<br>
-     * statement and parameters. <br>Example:<br>
-     * <code>
-     * sql = "DELETE FROM `user` WHERE `userId` = '1';";<br>
-     * updateData(sql);
-     * </code>
-     *
-     * @param sql The SQL statement to be executed.
-     * @return <code>boolean</code> value based on success or failure of deleting data.
-     *
-     */
-    public boolean deleteData(String sql) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        pstmt = con.prepareStatement(sql);
+        pstmt.setObject(1, sqlParam);
+        return pstmt.executeUpdate() > 0;
     }
 
     /**
      * Checks if a value exists in a table column.
-     * 
+     *
      * @param sql The SQL statement to be executed.
      * @param params values to be matched with.
-     * @return <code>boolean</code> value based on success or failure upon checking data.
+     * @return <code>boolean</code> value based on success or failure upon
+     * checking data.
+     * @throws java.sql.SQLException
      *
      */
-    public boolean contains(String sql, Object... params){
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            for(int i = 0; i<params.length; i++){
-                pstmt.setObject(i+1, params[i]);
-            }
-            ResultSet rs = pstmt.executeQuery();
-            if(rs.next()==true){
-                return true;
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    public boolean contains(String sql, Object... sqlParams) throws SQLException {
+        if (con == null) {
+            initConnection();
         }
-        return false;
+        pstmt = con.prepareStatement(sql);
+        for (int i = 0; i < sqlParams.length; i++) {
+            pstmt.setObject(i + 1, sqlParams[i]);
+        }
+        ResultSet rs = pstmt.executeQuery();
+        return rs.next();
     }
-    
+
     /**
      * Creates a table based on the SQL table creation statement.
      *
-     * @param sql The SQL statement to be executed.
-     * @return <code>boolean</code> value based on success or failure of creating table.
+     * @param tableName
+     * @return <code>boolean</code> value based on success or failure of
+     * creating table.
+     * @throws java.sql.SQLException
      */
-    public boolean createTable(String sql) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            pstmt.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    public boolean createTable(String tableName) throws SQLException {
+        if (con == null) {
+            initConnection();
         }
-        return true;
+        String sql = "CREATE TABLE IF NOT EXISTS " + tableName;
+        pstmt = con.prepareStatement(sql);
+        return pstmt.executeUpdate() > 0;
     }
 
     /**
      * Drops a table based on the SQL table creation statement.
      *
-     * @param sql The SQL statement to be executed.
-     * @return <code>boolean</code> value based on success or failure of dropping a table.
+     * @param tableName
+     * @return <code>boolean</code> value based on success or failure of
+     * dropping a table.
+     * @throws java.sql.SQLException
      */
-    public boolean dropTable(String sql) {
-        initConnection();
-        try {
-            pstmt = con.prepareStatement(sql);
-            pstmt.executeUpdate();
+    public boolean dropTable(String tableName) throws SQLException {
+        if (con == null) {
+            initConnection();
+        }
+        String sql = "DROP TABLE IF EXISTS '" + tableName + "'";
+        pstmt = con.prepareStatement(sql);
+        return pstmt.executeUpdate() > 0;
+    }
+
+    /**
+     *
+     * @return boolean value depending on closing state of the connection.
+     * @throws SQLException
+     */
+    public boolean closeConnection() throws SQLException {
+        if (this.con != null) {
+            this.con.close();
+            this.con = null;
             return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
             return false;
-        } finally {
-            try {
-                con.close(); 
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBCManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
 }
