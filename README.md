@@ -11,10 +11,15 @@ A Java Database Connectivity library to connect and make database transaction qu
             List<HashMap<String, Object>> maps = manager.getQueryData("Select * from userdetails;", new ArrayList<>());
             System.out.println("With Plain SQL");
             System.out.println("===============");
-            System.out.println(maps.toString());
+            for (HashMap<String, Object> hashMap : maps) {
+                System.out.println("Name = "+hashMap.get("name"));
+                System.out.println("Email = "+hashMap.get("email"));
+                System.out.println("Username = "+hashMap.get("username"));
+                System.out.println("Phone No = "+hashMap.get("phone_No"));
+            }
 
 ### Fetch data with Stored Procedure
-            
+
             String procedureName_getAllUsers = "{call getAllUsers()}";
             Class.forName("com.mysql.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "");
@@ -22,4 +27,9 @@ A Java Database Connectivity library to connect and make database transaction qu
             List<HashMap<String, Object>> maps = manager.getQueryDataWithStoredProcedure(procedureName_getAllUsers, new ArrayList<>());
             System.out.println("With stored procedure");
             System.out.println("=====================");
-            System.out.println(maps.toString());
+            for (HashMap<String, Object> hashMap : maps) {
+                System.out.println("Name = "+hashMap.get("name"));
+                System.out.println("Email = "+hashMap.get("email"));
+                System.out.println("Username = "+hashMap.get("username"));
+                System.out.println("Phone No = "+hashMap.get("phone_No"));
+            }
