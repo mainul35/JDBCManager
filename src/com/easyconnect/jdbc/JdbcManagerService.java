@@ -51,9 +51,11 @@ public class JdbcManagerService implements JdbcManager {
             if (connection != null) {
                 try {
                     connection.close();
+                    return "success";
                 } catch (SQLException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
+                    return "failure";
                 }
             }
         }
@@ -92,34 +94,27 @@ public class JdbcManagerService implements JdbcManager {
     }
 
     @Override
-    public String insertOrUpdate(String sql, List<String> storedProcParams) throws QueryException {
+    public String insertOrUpdate(String sql, List<String> params) throws QueryException {
         int count = 0;
         try {
             PreparedStatement pstmt = null;
             pstmt = connection.prepareStatement(sql);
             int i = 1;
-            for (String value : storedProcParams) {
+            for (String value : params) {
                 pstmt.setObject(i, value);
                 i++;
             }
             count = pstmt.executeUpdate();
+            connection.close();
+            if(count>0){
+                return "success";
+            }else{
+                return "Failure";
+            }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                    return "failure";
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
+            return "failure";
         }
-        if(count>0){
-            return "success";
-        }
-        return "failure";
     }
 
     @Override
@@ -129,7 +124,7 @@ public class JdbcManagerService implements JdbcManager {
         pstmt = connection.prepareStatement(sql);
         int i = 1;
         for (String value : param) {
-            pstmt.setObject(i, value);
+            pstmt.setObject(i++, value);
         }
         ResultSet rs = pstmt.executeQuery();
         
